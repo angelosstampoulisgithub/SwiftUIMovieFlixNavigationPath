@@ -43,9 +43,7 @@ struct ContentView: View {
                     }
                 }.task{
                     viewModel.fetchPopularMovies()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                    isLoading = false
-                    }
+                    isLoading = false
                 }.searchable(text: $movieTitle)
                 
                 .onChange(of: movieTitle) { oldValue, newValue in
