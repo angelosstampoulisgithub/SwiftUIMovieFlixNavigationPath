@@ -56,7 +56,7 @@ struct ContentView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: AppRoute.self) { item in
                 if item == .detailsView{
-                    MovieDetails(movie: getSelected, details: .init(id: 0, backdrop_path: "", poster_path: "", genres: [], title: "", overview: "", release_date: "", runtime: 0, vote_average: 0.0, homepage: ""), similarMovies: .init(results: []), isHeart: false)
+                    MovieDetails(movie: getSelected, details: .init(id: 0, backdrop_path: "", poster_path: "", genres: [], title: "", overview: "", release_date: "", runtime: 0, vote_average: 0.0, homepage: ""), isHeart: false)
                 }
             }
         }

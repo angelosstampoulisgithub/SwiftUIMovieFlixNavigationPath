@@ -13,9 +13,8 @@ class MovieListViewModel:ObservableObject {
     private var manager = NetworkManager()
     
     @Published var searchResults:[MovieListResultsModel] = []
-
-    @Published  var popularMovies: [MovieListResultsModel] = []
-    @Published  var movieDetails:[MovieDetailModel]=[]
+    @Published var popularMovies: [MovieListResultsModel] = []
+    @Published var similarMoviesArray:[MovieDetailModel]=[]
     private (set) var favoriteMovies: [Int] = UserDefaults.standard.array(forKey: "Favorites") as? [Int] ?? []
    
     func fetchSearchResults(for query: String) {
@@ -24,7 +23,21 @@ class MovieListViewModel:ObservableObject {
                 .contains(query)
         }
     }
-    
+    func movieSimilarArray(id:Int) async{
+        Task{
+            do{
+                let similarMovies = try await fetchSimilarMovies(id: id)
+                guard let results = similarMovies.results else{
+                    return
+                }
+                for item in 0..<results.count{
+                    similarMoviesArray.append(results[item])
+                }
+            }catch{
+                print("something went wrong!!!!")
+            }
+        }
+    }
     func fetchPopularMovies(isLoading:Bool) {
         if isLoading {
             Task{
@@ -37,6 +50,7 @@ class MovieListViewModel:ObservableObject {
             }
         }else{
             popularMovies.removeAll()
+            similarMoviesArray.removeAll()
             Task{
                 guard let movies = try await manager.fetchMovieList().results else{
                     return
@@ -51,7 +65,7 @@ class MovieListViewModel:ObservableObject {
     func fethMovieDetails(id:Int) async throws -> MovieDetailModel {
         return try await manager.fetchMovieDetails(with: id)
     }
-    func feetchSimilarMovies(id:Int) async throws -> SimilarMoviesModel {
+    func fetchSimilarMovies(id:Int) async throws -> SimilarMoviesModel {
         return try await manager.fetchSimilarMovies(with: id)
     }
     func addToFavorites(with id: Int) {

@@ -10,7 +10,7 @@ import SwiftUI
 struct MovieDetails: View {
     @State var  movie:MovieListResultsModel
     @State var details:MovieDetailModel
-    @State var similarMovies:SimilarMoviesModel
+    
     @State var detailsMovieArray:[MovieDetailModel] = []
     @EnvironmentObject var viewModel:MovieListViewModel
     @State var isHeart:Bool
@@ -40,7 +40,7 @@ struct MovieDetails: View {
                 Text("Similar Movies").frame(width:300,height:45,alignment: .leading)
                 ScrollView(.horizontal){
                     HStack{
-                        ForEach(detailsMovieArray,id:\.self){movie in
+                        ForEach(viewModel.similarMoviesArray,id:\.self){movie in
                             AsyncImage(url: URL(string: movie.getImageUrl())) { image in
                                 image.resizable()
                                     .frame(width:150,height:145)
@@ -55,10 +55,7 @@ struct MovieDetails: View {
         }.task{
             do{
                 details = try await viewModel.fethMovieDetails(id: movie.id!)
-                similarMovies = try await viewModel.feetchSimilarMovies(id: movie.id!)
-                for item in 0..<similarMovies.results!.count{
-                    detailsMovieArray.append(similarMovies.results![item])
-                }
+                await viewModel.movieSimilarArray(id: movie.id!)
             }catch{
                 print("something went wrong!!!!")
             }

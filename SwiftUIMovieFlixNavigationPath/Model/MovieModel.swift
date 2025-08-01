@@ -49,6 +49,8 @@ struct ReviewModel: Decodable {
 }
 
 //MARK: Similar
-struct SimilarMoviesModel: Decodable {
+struct SimilarMoviesModel: Decodable,Equatable {
     let results: [MovieDetailModel]?
+    let id: Int?
+
 }
