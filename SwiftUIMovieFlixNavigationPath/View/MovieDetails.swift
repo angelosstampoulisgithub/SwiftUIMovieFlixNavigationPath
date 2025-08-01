@@ -53,10 +53,14 @@ struct MovieDetails: View {
                 }.frame(width:300)
             }
         }.task{
-            details = await viewModel.fethMovieDetails(id: movie.id!)
-            similarMovies = await viewModel.feetchSimilarMovies(id: movie.id!)
-            for item in 0..<similarMovies.results!.count{
-                detailsMovieArray.append(similarMovies.results![item])
+            do{
+                details = try await viewModel.fethMovieDetails(id: movie.id!)
+                similarMovies = try await viewModel.feetchSimilarMovies(id: movie.id!)
+                for item in 0..<similarMovies.results!.count{
+                    detailsMovieArray.append(similarMovies.results![item])
+                }
+            }catch{
+                print("something went wrong!!!!")
             }
             if let favorites = UserDefaults.standard.array(forKey: "Favorites") as? [Int] {
                 if favorites.contains(movie.id!) {

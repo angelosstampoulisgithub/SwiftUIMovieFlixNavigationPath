@@ -10,7 +10,6 @@ struct ContentView: View {
     @EnvironmentObject var viewModel:MovieListViewModel
     @StateObject var navigationManager = NavigationManager()
     @State var movieTitle:String
-    @State var searchResults:[MovieListResultsModel] = []
     var isSearching: Bool {
         return !movieTitle.isEmpty
     }
@@ -22,11 +21,10 @@ struct ContentView: View {
     var body: some View {
         NavigationStack(path:$navigationManager.path){
             ScrollView{
-                ForEach(isSearching ? searchResults.unique() : viewModel.popularMovies,id:\.self){item in
+                ForEach(isSearching ? viewModel.searchResults.unique() : viewModel.popularMovies,id:\.self){item in
                     VStack{
                         HStack{
                             CellRow(movie: item, isHeart: false).redacted(reason: isLoading ? .placeholder : [])
-                            
                             Button {
                                 getSelected = item
                                 navigationManager.push(AppRoute.detailsView)
@@ -41,15 +39,20 @@ struct ContentView: View {
                             }
                         }
                     }
-                }.task{
-                    viewModel.fetchPopularMovies()
-                    isLoading = false
-                }.searchable(text: $movieTitle)
+                }
+                .task{
+                    viewModel.fetchPopularMovies(isLoading: isLoading)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    isLoading = false
+                    }
+                }
+                .searchable(text: $movieTitle)
                 
                 .onChange(of: movieTitle) { oldValue, newValue in
-                        fetchSearchResults(for: newValue)
+                    viewModel.fetchSearchResults(for: newValue)
                 }
-            }.navigationTitle("SwiftUIMovieFlix")
+            }
+            .navigationTitle("SwiftUIMovieFlix")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: AppRoute.self) { item in
                 if item == .detailsView{
@@ -58,11 +61,6 @@ struct ContentView: View {
             }
         }
     }
-    func fetchSearchResults(for query: String) {
-        searchResults = viewModel.popularMovies.filter { product in
-            product.title!
-                .contains(movieTitle)
-        }
-    }
+ 
 }
 

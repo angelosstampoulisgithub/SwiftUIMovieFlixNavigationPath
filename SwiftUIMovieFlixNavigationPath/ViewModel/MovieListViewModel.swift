@@ -8,37 +8,51 @@
 import Foundation
 import SwiftUI
 @MainActor
-final class MovieListViewModel:ObservableObject {
+class MovieListViewModel:ObservableObject {
     
     private var manager = NetworkManager()
     
+    @Published var searchResults:[MovieListResultsModel] = []
+
     @Published  var popularMovies: [MovieListResultsModel] = []
     @Published  var movieDetails:[MovieDetailModel]=[]
     private (set) var favoriteMovies: [Int] = UserDefaults.standard.array(forKey: "Favorites") as? [Int] ?? []
+   
+    func fetchSearchResults(for query: String) {
+        searchResults = popularMovies.filter { product in
+            product.title!
+                .contains(query)
+        }
+    }
     
-    func fetchPopularMovies()  {
-        Task{
-            let movies = try await manager.fetchMovieList()
-            for movie in 0..<movies.results!.count{
-                popularMovies.append(movies.results![movie])
-            }
-        }
-    }
-    func fethMovieDetails(id:Int) async -> MovieDetailModel {
-        return await withCheckedContinuation { continuation in
+    func fetchPopularMovies(isLoading:Bool) {
+        if isLoading {
             Task{
-                continuation.resume(returning:try await manager.fetchMovieDetails(with: id))
+                guard let movies = try await manager.fetchMovieList().results else{
+                    return
+                }
+                for movie in 0..<movies.count{
+                    popularMovies.append(movies[movie])
+                }
+            }
+        }else{
+            popularMovies.removeAll()
+            Task{
+                guard let movies = try await manager.fetchMovieList().results else{
+                    return
+                }
+                for movie in 0..<movies.count{
+                    popularMovies.append(movies[movie])
+                }
             }
         }
         
     }
-    func feetchSimilarMovies(id:Int) async -> SimilarMoviesModel {
-        return await withCheckedContinuation { continuation in
-            Task{
-                continuation.resume(returning:try await manager.fetchSimilarMovies(with: id))
-            }
-        }
-        
+    func fethMovieDetails(id:Int) async throws -> MovieDetailModel {
+        return try await manager.fetchMovieDetails(with: id)
+    }
+    func feetchSimilarMovies(id:Int) async throws -> SimilarMoviesModel {
+        return try await manager.fetchSimilarMovies(with: id)
     }
     func addToFavorites(with id: Int) {
         favoriteMovies.append(id)
@@ -50,6 +64,6 @@ final class MovieListViewModel:ObservableObject {
         UserDefaults.standard.set(favoriteMovies, forKey: "Favorites")
     }
     
-
-   
+    
+    
 }
