@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct SwiftUIMovieFlixNavigationPathApp: App {
-    @StateObject var viewModel = MovieListViewModel()
+    @StateObject var viewModel = MovieListViewModel(searchResults: [], popularMovies: [], similarMoviesArray: [], favoriteMovies: [])
 
     var body: some Scene {
         WindowGroup {

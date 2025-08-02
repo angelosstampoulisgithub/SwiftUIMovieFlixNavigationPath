@@ -8,8 +8,8 @@
 import SwiftUI
 struct CellRow: View {
     @State var movie:MovieListResultsModel
-    @EnvironmentObject var viewModel:MovieListViewModel
     @State var isHeart:Bool
+    @State var viewModel = MovieFavoritesViewModels()
     var body: some View {
             HStack{
                 AsyncImage(url: URL(string: movie.getImageUrl())) { image in
@@ -23,10 +23,6 @@ struct CellRow: View {
                     VStack{
                         Text(movie.title!).padding(5)
                         Text(movie.release_date!)
-                        HStack{
-                            Image("rating").padding(5)
-                            Text(String(format:"%.2f",movie.vote_average!))
-                        }
                     }
                     HStack{
                         Button {

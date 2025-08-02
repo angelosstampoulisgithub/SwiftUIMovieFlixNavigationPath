@@ -7,7 +7,7 @@
 
 import Foundation
 //MARK: Detail
-struct MovieDetailModel: Decodable,Hashable,Equatable {
+struct MovieDetailModel: Identifiable,Decodable,Hashable,Equatable {
     let id: Int?
     let backdrop_path: String?
     let poster_path: String?

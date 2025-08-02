@@ -21,7 +21,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack(path:$navigationManager.path){
             ScrollView{
-                ForEach(isSearching ? viewModel.searchResults.unique() : viewModel.popularMovies,id:\.self){item in
+                ForEach(isSearching ? viewModel.searchResults.unique() : viewModel.popularMovies.unique(),id:\.self){item in
                     VStack{
                         HStack{
                             CellRow(movie: item, isHeart: false).redacted(reason: isLoading ? .placeholder : [])
@@ -56,7 +56,7 @@ struct ContentView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: AppRoute.self) { item in
                 if item == .detailsView{
-                    MovieDetails(movie: getSelected, details: .init(id: 0, backdrop_path: "", poster_path: "", genres: [], title: "", overview: "", release_date: "", runtime: 0, vote_average: 0.0, homepage: ""), isHeart: false)
+                    MovieDetails(movie: getSelected)
                 }
             }
         }

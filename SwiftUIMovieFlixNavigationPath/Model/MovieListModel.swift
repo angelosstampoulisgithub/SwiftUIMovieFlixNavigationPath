@@ -13,7 +13,7 @@ struct MovieListModel: Decodable{
     let total_results: Int?
 }
 
-struct MovieListResultsModel: Decodable,Hashable {
+struct MovieListResultsModel: Decodable,Hashable,Identifiable {
     let backdrop_path: String?
     let id: Int?
     let release_date: String?
