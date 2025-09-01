@@ -38,17 +38,17 @@ struct MovieDetailListView: View {
 
     var body: some View {
         List {
-            if movieImagePath.count == 0 {
-                Image("themovie").resizable()
-            }else{
-                AsyncImage(url: URL(string:"https://image.tmdb.org/t/p/original" + (movie.backdropPath ?? ""))) { image in
-                    image
-                        .resizable()
-                } placeholder: {
-                    ProgressView()
-                }.frame(width: 300, height: 295)
-                    .listRowSeparator(.hidden)
-            }
+            AsyncImage(url:  URL(string:"https://image.tmdb.org/t/p/original" + (movie.backdropPath ?? ""))) { image in
+                image.resizable()
+            } placeholder: {
+                if movie.backdropPath == nil{
+                    Text("Content unavailable")
+                }else{
+                    Text("Loading")
+                }
+            }.frame(width: 300, height: 295)
+            .listRowSeparator(.hidden)
+            
             HStack {
                 Text(movie.genreText)
                 Text("·")

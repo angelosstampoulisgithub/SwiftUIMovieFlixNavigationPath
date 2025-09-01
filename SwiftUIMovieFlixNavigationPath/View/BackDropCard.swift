@@ -15,21 +15,20 @@ struct BackDropCard: View {
             ZStack {
                 Rectangle()
                     .fill(Color.gray.opacity(0.3))
-                if movieImagePath.count == 0 {
-                    Image("themovie").resizable()
-                }else{
                     AsyncImage(url: movie.backdropURL) { image in
                         image
                             .resizable()
                     } placeholder: {
-                        ProgressView()
+                        if movie.backdropPath == nil{
+                            Text("Content unavailable")
+                        }else{
+                            Text("Loading")
+                        }
                         
                         
                     }.frame(width: 300, height: 295)
                     .listRowSeparator(.hidden)
-                }
-            }.task {
-                movieImagePath = movie.backdropPath ?? ""
+                
             }
             .aspectRatio(16/9, contentMode: .fit)
             .cornerRadius(8)
