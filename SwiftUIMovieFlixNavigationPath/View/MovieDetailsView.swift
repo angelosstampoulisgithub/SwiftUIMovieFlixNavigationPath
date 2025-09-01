@@ -38,17 +38,17 @@ struct MovieDetailListView: View {
 
     var body: some View {
         List {
-            AsyncImage(url: URL(string:"https://image.tmdb.org/t/p/original" + (movie.backdropPath ?? ""))) { image in
-                               image
-                                   .resizable()
-            } placeholder: {
-                if movieImagePath.count == 0 {
-                    Image("imdb").resizable()
-                }else{
+            if movieImagePath.count == 0 {
+                Image("themovie").resizable()
+            }else{
+                AsyncImage(url: URL(string:"https://image.tmdb.org/t/p/original" + (movie.backdropPath ?? ""))) { image in
+                    image
+                        .resizable()
+                } placeholder: {
                     ProgressView()
-                }
-            }.frame(width: 300, height: 295)
-                .listRowSeparator(.hidden)
+                }.frame(width: 300, height: 295)
+                    .listRowSeparator(.hidden)
+            }
             HStack {
                 Text(movie.genreText)
                 Text("·")
@@ -107,7 +107,7 @@ struct MovieDetailListView: View {
             }.listRowSeparator(.hidden)
             
         }.scrollContentBackground(.hidden)
-        .onAppear {
+        .task {
             movieImagePath = movie.backdropPath ?? ""
         }
             

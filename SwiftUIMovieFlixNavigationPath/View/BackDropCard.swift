@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-
 struct BackDropCard: View {
     
     let movie: Movie
@@ -16,20 +15,22 @@ struct BackDropCard: View {
             ZStack {
                 Rectangle()
                     .fill(Color.gray.opacity(0.3))
-                AsyncImage(url: movie.backdropURL) { image in
-                                   image
-                                       .resizable()
-                } placeholder: {
-                    if movieImagePath.count == 0 {
-                        Image("imdb").resizable()
-                    }else{
+                if movieImagePath.count == 0 {
+                    Image("themovie").resizable()
+                }else{
+                    AsyncImage(url: movie.backdropURL) { image in
+                        image
+                            .resizable()
+                    } placeholder: {
                         ProgressView()
-                    }
-                    
-                }.frame(width: 300, height: 295)
-            }.onAppear(perform: {
+                        
+                        
+                    }.frame(width: 300, height: 295)
+                    .listRowSeparator(.hidden)
+                }
+            }.task {
                 movieImagePath = movie.backdropPath ?? ""
-            })
+            }
             .aspectRatio(16/9, contentMode: .fit)
             .cornerRadius(8)
             .shadow(radius: 4)
