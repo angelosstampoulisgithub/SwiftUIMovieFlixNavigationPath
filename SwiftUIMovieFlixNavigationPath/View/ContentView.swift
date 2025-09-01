@@ -12,10 +12,12 @@ struct ContentView: View {
         return !movieTitle.isEmpty
     }
     @StateObject var popularState:MovieDetailState
+    @StateObject var navigationManager = NavigationManager()
     @State var searchQuery: String = ""
     @State var searchResults:[Movie]
+    @State var movieID:Int
     var body: some View {
-        NavigationView {
+        NavigationStack(path:$navigationManager.path) {
             VStack{
                 ZStack{
                     VStack{
@@ -46,10 +48,20 @@ struct ContentView: View {
                         .padding(20)
                 }
                 List(isSearching ? self.searchResults : self.popularState.movies ?? []){movie in
-                        
-                        NavigationLink(destination: MovieDetailView(movieId: movie.id)) {
-                            BackDropCard(movie: movie).listRowSeparator(.hidden)
-                        }.listRowSeparator(.hidden)
+                        HStack{
+                            BackDropCard(movie: movie, movieImagePath: "").listRowSeparator(.hidden)
+                            Image(systemName: "arrow.right").onTapGesture {
+                                navigationManager.push(route: AppRoute.details)
+                                movieID = movie.id
+                        }
+                    }.listRowSeparator(.hidden)
+                   
+                       
+                }.navigationDestination(for: AppRoute.self) { route in
+                    if route == .details{
+                        MovieDetailView(movieId: movieID)
+                    }
+                    
                 }
                     .scrollContentBackground(.hidden)
                     .navigationBarTitle("The MovieDb")

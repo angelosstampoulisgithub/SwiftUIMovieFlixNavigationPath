@@ -19,7 +19,7 @@ struct MovieDetailView: View {
             }
             
             if movieDetailState.movie != nil {
-                MovieDetailListView(movie: self.movieDetailState.movie!)
+                MovieDetailListView(movie: self.movieDetailState.movie!, movieImagePath: "")
                 
             }
         }
@@ -34,14 +34,19 @@ struct MovieDetailListView: View {
     
     let movie: Movie
     @State private var selectedTrailer: MovieVideo?
-    
+    @State var movieImagePath:String
+
     var body: some View {
         List {
             AsyncImage(url: URL(string:"https://image.tmdb.org/t/p/original" + (movie.backdropPath ?? ""))) { image in
                                image
                                    .resizable()
             } placeholder: {
-                               ProgressView()
+                if movieImagePath.count == 0 {
+                    Image("imdb").resizable()
+                }else{
+                    ProgressView()
+                }
             }.frame(width: 300, height: 295)
                 .listRowSeparator(.hidden)
             HStack {
@@ -102,6 +107,9 @@ struct MovieDetailListView: View {
             }.listRowSeparator(.hidden)
             
         }.scrollContentBackground(.hidden)
+        .onAppear {
+            movieImagePath = movie.backdropPath ?? ""
+        }
             
     }
 }
