@@ -28,8 +28,7 @@ struct ContentView: View {
                                     .stroke(Color.black, lineWidth: 2)
                             )
                             .onChange(of: movieTitle, { oldValue, newValue in
-                                    self.popularState.searchMovie(query: movieTitle)
-                            }).onSubmit {
+                                self.popularState.searchMovie(query: movieTitle)
                                 if searchResults.count > 0 {
                                     searchResults.removeAll()
                                     guard let response = popularState.response else{
@@ -43,7 +42,7 @@ struct ContentView: View {
                                     searchResults.append(contentsOf: response.results.compactMap{$0})
                                 }
 
-                            }
+                            })
                     }.frame(maxWidth: .infinity,maxHeight: 50,alignment: .top)
                         .padding(20)
                 }
