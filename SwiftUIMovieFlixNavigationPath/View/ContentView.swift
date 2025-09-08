@@ -16,12 +16,14 @@ struct ContentView: View {
     @State var searchQuery: String = ""
     @State var searchResults:[Movie]
     @State var movieID:Int
+    @FocusState private var isFocused: Bool
     var body: some View {
         NavigationStack(path:$navigationManager.path) {
             VStack{
                 ZStack{
                     VStack{
-                        TextField("Movie Title", text: $movieTitle)
+                        TextField("Enter Movie Title and then press Enter", text: $movieTitle)
+                            .focused($isFocused)
                             .frame(width: 300,height:45,alignment: .center)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 15)
@@ -29,6 +31,8 @@ struct ContentView: View {
                             )
                             .onChange(of: movieTitle, { oldValue, newValue in
                                 self.popularState.searchMovie(query: movieTitle)
+
+                            }).onSubmit {
                                 if searchResults.count > 0 {
                                     searchResults.removeAll()
                                     guard let response = popularState.response else{
@@ -41,8 +45,7 @@ struct ContentView: View {
                                     }
                                     searchResults.append(contentsOf: response.results.compactMap{$0})
                                 }
-
-                            })
+                            }
                     }.frame(maxWidth: .infinity,maxHeight: 50,alignment: .top)
                         .padding(20)
                 }
@@ -69,6 +72,7 @@ struct ContentView: View {
             }
         }.task {
             self.popularState.loadMovies(with: .popular)
+            isFocused.toggle()
         }
         
     }
