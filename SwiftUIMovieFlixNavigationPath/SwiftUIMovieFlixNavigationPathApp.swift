@@ -12,7 +12,7 @@ struct SwiftUIMovieFlixNavigationPathApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(movieTitle: "", popularState: .init(), searchResults: [], movieID: 0)
+            ContentView(movieTitle: "", isSearching: false, popularState: .init(), searchResults: [], movieID: 0)
              
         }
     }

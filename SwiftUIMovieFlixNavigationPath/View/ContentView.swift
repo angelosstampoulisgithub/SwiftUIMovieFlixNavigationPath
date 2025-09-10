@@ -8,9 +8,8 @@
 import SwiftUI
 struct ContentView: View {
     @State var movieTitle:String
-    var isSearching: Bool {
-        return !movieTitle.isEmpty
-    }
+    @State var isSearching: Bool
+    
     @StateObject var popularState:MovieDetailState
     @StateObject var navigationManager = NavigationManager()
     @State var searchQuery: String = ""
@@ -30,6 +29,8 @@ struct ContentView: View {
                                     .stroke(Color.black, lineWidth: 2)
                             )
                             .onChange(of: movieTitle, { oldValue, newValue in
+                                isFocused = true
+                                isSearching = true
                                 self.popularState.searchMovie(query: movieTitle)
 
                             }).onSubmit {
@@ -72,7 +73,7 @@ struct ContentView: View {
             }
         }.task {
             self.popularState.loadMovies(with: .popular)
-            isFocused.toggle()
+           
         }
         
     }
