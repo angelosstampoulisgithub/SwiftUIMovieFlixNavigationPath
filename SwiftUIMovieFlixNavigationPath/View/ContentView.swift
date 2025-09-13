@@ -31,20 +31,15 @@ struct ContentView: View {
                             .onChange(of: movieTitle, { oldValue, newValue in
                                 isFocused = true
                                 isSearching = true
+                                self.searchResults.removeAll()
                                 self.popularState.searchMovie(query: movieTitle)
 
                             }).onSubmit {
-                                if searchResults.count > 0 {
-                                    searchResults.removeAll()
-                                    guard let response = popularState.response else{
-                                        return
-                                    }
-                                    searchResults.append(contentsOf: response.results.compactMap{$0})
-                                }else{
-                                    guard let response = popularState.response else{
-                                        return
-                                    }
-                                    searchResults.append(contentsOf: response.results.compactMap{$0})
+                                guard let response = popularState.response else{
+                                    return
+                                }
+                                response.results.forEach { movie in
+                                    searchResults.append(movie)
                                 }
                             }
                     }.frame(maxWidth: .infinity,maxHeight: 50,alignment: .top)
@@ -64,7 +59,6 @@ struct ContentView: View {
                     if route == .details{
                         MovieDetailView(movieId: movieID)
                     }
-                    
                 }
                     .scrollContentBackground(.hidden)
                     .navigationBarTitle("The MovieDb")
