@@ -2,7 +2,7 @@
 //  SwiftUIMovieFlixNavigationPathUITestsLaunchTests.swift
 //  SwiftUIMovieFlixNavigationPathUITests
 //
-//  Created by Angelos Staboulis on 10/4/25.
+//  Created by Angelos Staboulis on 15/9/25.
 //
 
 import XCTest

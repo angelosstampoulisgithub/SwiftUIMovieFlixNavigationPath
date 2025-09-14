@@ -2,76 +2,86 @@
 //  ContentView.swift
 //  SwiftUIMovieFlixNavigationPath
 //
-//  Created by Angelos Staboulis on 8/1/25.
+//  Created by Angelos Staboulis on 15/9/25.
 //
 
 import SwiftUI
-struct ContentView: View {
-    @State var movieTitle:String
-    @State var isSearching: Bool
-    
-    @StateObject var popularState:MovieDetailState
-    @StateObject var navigationManager = NavigationManager()
-    @State var searchQuery: String = ""
-    @State var searchResults:[Movie]
-    @State var movieID:Int
-    @FocusState private var isFocused: Bool
-    var body: some View {
-        NavigationStack(path:$navigationManager.path) {
-            VStack{
-                ZStack{
-                    VStack{
-                        TextField("Enter Movie Title and then press Enter", text: $movieTitle)
-                            .focused($isFocused)
-                            .frame(width: 300,height:45,alignment: .center)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.black, lineWidth: 2)
-                            )
-                            .onChange(of: movieTitle, { oldValue, newValue in
-                                isFocused = true
-                                isSearching = true
-                                self.searchResults.removeAll()
-                                self.popularState.searchMovie(query: movieTitle)
 
-                            }).onSubmit {
-                                guard let response = popularState.response else{
-                                    return
-                                }
-                                response.results.forEach { movie in
-                                    searchResults.append(movie)
+struct ContentView: View {
+    @StateObject private var viewModel: MovieViewModel
+    @State  var path = NavigationPath()
+    @State var isSearching:Bool
+    init(apiKey: String,isSearching:Bool) {
+        _viewModel = StateObject(wrappedValue: MovieViewModel(service: NetworkService(apiKey: apiKey)))
+        self.isSearching = isSearching
+    }
+
+    var body: some View {
+        NavigationStack(path: $path) {
+            VStack {
+                // MARK: Search bar
+                HStack {
+                    TextField("Search movies...", text: $viewModel.searchText, onCommit: {
+                        Task {
+                            isSearching = true
+                            await viewModel.searchMovies()
+                        }
+                    })
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+
+                    Button("Search") {
+                        Task {
+                            isSearching = true
+                            await viewModel.searchMovies()
+                        }
+                    }
+                    .padding(.trailing)
+                }
+                .padding(.top)
+
+                // MARK: List / Results
+                if viewModel.isLoading {
+                    ProgressView("Loading…")
+                    Spacer()
+                } else if let error = viewModel.errorMessage {
+                    VStack {
+                        Text(error)
+                            .foregroundColor(.red)
+                            .padding()
+                        Button("Retry") {
+                            Task {
+                                if viewModel.searchText.isEmpty {
+                                    await viewModel.loadPopularMovies()
+                                } else {
+                                    isSearching = true
+                                    await viewModel.searchMovies()
                                 }
                             }
-                    }.frame(maxWidth: .infinity,maxHeight: 50,alignment: .top)
-                        .padding(20)
-                }
-                List(isSearching ? self.searchResults : self.popularState.movies ?? []){movie in
-                        HStack{
-                            BackDropCard(movie: movie, movieImagePath: "").listRowSeparator(.hidden)
-                            Image(systemName: "arrow.right").onTapGesture {
-                                navigationManager.push(route: AppRoute.details)
-                                movieID = movie.id
                         }
-                    }.listRowSeparator(.hidden)
-                   
-                       
-                }.navigationDestination(for: AppRoute.self) { route in
-                    if route == .details{
-                        MovieDetailView(movieId: movieID)
                     }
+                    Spacer()
+                } else {
+                    List(isSearching ? viewModel.searchMovies : viewModel.movies) { movie in
+                        Button {
+                            path.append(movie)
+                        } label: {
+                            MovieRowview(movie: movie)
+                        }
+                    }
+                    .listStyle(.plain)
                 }
-                    .scrollContentBackground(.hidden)
-                    .navigationBarTitle("The MovieDb")
-                    .navigationBarTitleDisplayMode(.inline)
-                
             }
-        }.task {
-            self.popularState.loadMovies(with: .popular)
-           
+            .navigationTitle("Movies")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: Movie.self) { movie in
+                MovieDetailView(movieId: movie.id, service: viewModel.service)
+            }
         }
-        
+        .task {
+            await viewModel.loadPopularMovies()
+        }
     }
-    
+        
 }
-
 

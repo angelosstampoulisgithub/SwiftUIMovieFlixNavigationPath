@@ -2,18 +2,16 @@
 //  SwiftUIMovieFlixNavigationPathApp.swift
 //  SwiftUIMovieFlixNavigationPath
 //
-//  Created by Angelos Staboulis on 10/4/25.
+//  Created by Angelos Staboulis on 15/9/25.
 //
 
 import SwiftUI
 
 @main
 struct SwiftUIMovieFlixNavigationPathApp: App {
-    
     var body: some Scene {
         WindowGroup {
-            ContentView(movieTitle: "", isSearching: false, popularState: .init(), searchResults: [], movieID: 0)
-             
+            ContentView(apiKey: "d8d8c423", isSearching: false)
         }
     }
 }
